@@ -18,10 +18,11 @@ jobs:
         with:
           lfs: true
 
-      - name: 📦 Pull LFS files
+      - name: 📦 Fetch all LFS files
         run: |
           git lfs install
-          git lfs pull
+          git lfs fetch --all
+          git lfs checkout
 
       - name: 🗜️ Zip Unreal project
         run: |
