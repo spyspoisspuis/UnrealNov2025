@@ -1,9 +1,10 @@
-name: Unreal Project Auto-Release on Branch Creation
+name: Unreal Project Auto-Release
 
 on:
   create:
     branches:
       - "*"
+  workflow_dispatch:   # ✅ allows manual trigger from Actions tab
 
 permissions:
   contents: write
@@ -18,28 +19,29 @@ jobs:
         with:
           lfs: true
 
-      - name: 📦 Fetch all LFS files
+      - name: 📦 Ensure full LFS content is present
         run: |
           git lfs install
-          git lfs fetch --all
-          git lfs checkout
+          echo "Fetching and checking out LFS files..."
+          git lfs pull
+          echo "Verifying sample LFS files:"
+          find Content -type f \( -name "*.umap" -o -name "*.uasset" \) | head -5 | xargs ls -lh
 
       - name: 🗜️ Zip Unreal project
         run: |
           repo_name="${{ github.event.repository.name }}"
           zip_name="${repo_name}-${{ github.ref_name }}.zip"
           echo "Creating archive: $zip_name"
-          zip -r "$zip_name" . -x "*.git*" -x "*.github*" -x "*Saved*" -x "*Intermediate*" -x "*.vs*" -x "*.idea*"
-
+          zip -r "$zip_name" . \
+            -x "*.git*" -x "*.github*" -x "*Saved*" -x "*Intermediate*" -x "*.vs*" -x "*.idea*"
 
       - name: 🚀 Create or update release for this branch
-        id: create_release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: "branch-${{ github.ref_name }}"
           name: "Branch ${{ github.ref_name }}"
           body: "Auto-generated build ZIP for branch `${{ github.ref_name }}`"
           files: |
-            ${{ github.repository }}-${{ github.ref_name }}.zip
+            ${{ github.event.repository.name }}-${{ github.ref_name }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
