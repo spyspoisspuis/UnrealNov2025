@@ -1,0 +1,42 @@
+name: Unreal Project Auto-Release on Branch Creation
+
+on:
+  create:
+    branches:
+      - "*"
+
+permissions:
+  contents: write
+
+jobs:
+  package-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🛎️ Checkout repository with LFS
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: 📦 Pull LFS files
+        run: |
+          git lfs install
+          git lfs pull
+
+      - name: 🗜️ Zip Unreal project
+        run: |
+          zip_name="${{ github.repository }}-${{ github.ref_name }}.zip"
+          echo "Creating archive: $zip_name"
+          zip -r "$zip_name" . -x "*.git*" -x "*.github*" -x "*Saved*" -x "*Intermediate*" -x "*.vs*" -x "*.idea*"
+
+      - name: 🚀 Create or update release for this branch
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "branch-${{ github.ref_name }}"
+          name: "Branch ${{ github.ref_name }}"
+          body: "Auto-generated build ZIP for branch `${{ github.ref_name }}`"
+          files: |
+            ${{ github.repository }}-${{ github.ref_name }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
