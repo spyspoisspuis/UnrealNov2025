@@ -1,0 +1,46 @@
+# Unreal Engine
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+*.sln
+*.suo
+*.xcodeproj
+*.xcworkspace
+.vscode/
+.idea/
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+
+# Build artifacts
+*.log
+*.tlog
+*.obj
+*.pdb
+*.exe
+*.dll
+*.lib
+*.app
+*.ipa
+
+# Configurations that shouldn’t be tracked
+*.iml
+*.ipr
+
+# Mac
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Backup files
+*_Backup*/
+Backup*/
+
+# Optional: ignore plugins you don’t want to commit
+# Plugins/SomeLargePlugin/
+
+# Optional: ignore specific maps or assets you regenerate
+# Content/Temp/
